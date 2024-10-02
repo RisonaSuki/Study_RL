@@ -27,7 +27,7 @@ gamma = 0.99  # 折扣因子
 epsilon = 1.0  # 初始探索率
 epsilon_min = 0.01
 epsilon_decay = 0.995
-batch_size = 64
+batch_size = 256
 memory_size = 2000
 target_update = 10  # 每10步更新目标网络
 episodes = 1000
@@ -53,11 +53,6 @@ optimizer = optim.Adam(q_network.parameters(), lr=learning_rate)
 
 # 存储经验
 def store_experience(state, action, reward, next_state, done):
-    # 确保 state 和 next_state 是 numpy 数组
-    state = np.array(state)
-    next_state = np.array(next_state)
-
-    # 存储到经验回放
     memory.append((state, action, reward, next_state, done))
 
 # 选择动作 (epsilon-greedy 策略)
