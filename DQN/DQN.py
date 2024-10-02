@@ -41,10 +41,10 @@ env = gym.make("CartPole-v1")
 
 # 经验回放缓冲区
 memory = deque(maxlen=memory_size)
-
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # 创建 Q 网络和目标网络
-q_network = DQN(state_size, action_size)
-target_network = DQN(state_size, action_size)
+q_network = DQN(state_size, action_size).to(device)
+target_network = DQN(state_size, action_size).to(device)
 target_network.load_state_dict(q_network.state_dict())
 target_network.eval()
 
@@ -66,7 +66,7 @@ def select_action(state, epsilon):
         return random.choice(np.arange(action_size))  # 随机探索
     else:
         with torch.no_grad():
-            state = torch.FloatTensor(state).unsqueeze(0)
+            state = torch.FloatTensor(state).unsqueeze(0).to(device)
             q_values = q_network(state)
             return torch.argmax(q_values).item()  # 选择 Q 值最高的动作
 
@@ -78,11 +78,11 @@ def replay():
     
     states, actions, rewards, next_states, dones = zip(*batch)
     # 转换为 PyTorch 张量
-    states = torch.FloatTensor(states)
-    actions = torch.LongTensor(actions).unsqueeze(1)
-    rewards = torch.FloatTensor(rewards).unsqueeze(1)
-    next_states = torch.FloatTensor(next_states)
-    dones = torch.FloatTensor(dones).unsqueeze(1)
+    states = torch.FloatTensor(states).to(device)
+    actions = torch.LongTensor(actions).unsqueeze(1).to(device)
+    rewards = torch.FloatTensor(rewards).unsqueeze(1).to(device)
+    next_states = torch.FloatTensor(next_states).to(device)
+    dones = torch.FloatTensor(dones).unsqueeze(1).to(device)
 
     # 当前 Q 网络预测的 Q 值
     q_values = q_network(states).gather(1, actions)#.gather用于根据索引从输入张量中检索指定维度的值
