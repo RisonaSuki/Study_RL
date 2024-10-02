@@ -19,7 +19,6 @@ class DQN(nn.Module):
         x = torch.relu(self.fc2(x))
         return self.fc3(x)
 
-# 超参数
 state_size = 4  # CartPole-v1 的状态空间维度
 action_size = 2  # 动作空间维度（左右推杆）
 learning_rate = 0.001
@@ -80,7 +79,7 @@ def replay():
     dones = torch.FloatTensor(dones).unsqueeze(1).to(device)
 
     # 当前 Q 网络预测的 Q 值
-    q_values = q_network(states).gather(1, actions)#.gather用于根据索引从输入张量中检索指定维度的值
+    q_values = q_network(states).gather(1, actions)
 
     # 目标 Q 值
     next_q_values = target_network(next_states).max(1)[0].unsqueeze(1)
